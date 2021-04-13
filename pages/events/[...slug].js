@@ -1,7 +1,38 @@
+import { useRouter } from "next/router";
+import { getFilteredEvents } from "../../dummy-data";
+import EventList from '../../components/events/event-list';
+
 const FilteredEventsPage = () => {
-  return (
-    <h1>This is the Event Filter Page</h1>
-  )
-}
+  const router = useRouter();
+  const filteredData = router.query.slug; //useRouter hook only runs after component is initially rendered. filtered data is undefined on initial render
+
+  if (!filteredData) {
+    return <p className="center">Loading...</p>;
+  }
+
+  const filteredYear = filteredData[0];
+  const filteredMonth = filteredData[1];
+  const numYear = +filteredYear; // coerece string to value
+  const numMonth = +filteredMonth;
+
+  if (
+    isNaN(numYear) ||
+    isNaN(numMonth) ||
+    numYear > 2030 ||
+    numYear < 2021 ||
+    numMonth < 1 ||
+    numMonth > 12
+  ) {
+    return <p>Invalid filter. Please adjust your values</p>;
+  }
+
+  const filteredEvents = getFilteredEvents({ year: numYear, month: numMonth });
+
+  if(!filteredEvents || !filteredEvents.length){
+    return <p>No events found for the chosen filter!</p>
+  }
+
+  return <EventList items={filteredEvents}/>;
+};
 
 export default FilteredEventsPage;
