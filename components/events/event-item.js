@@ -1,3 +1,5 @@
+import Image from 'next/image'
+
 import Button from "../ui/button";
 import DateIcon from "../icons/date-icon";
 import AddressIcon from "../icons/address-icon";
@@ -19,7 +21,9 @@ const EventItem = (props) => {
   return (
     <li className={classes.item}>
       {/* next looks for static content in the public folder - allows us to look for src url as if we're already inside the public folder */}
-      <img src={"/" + image} alt={title} />
+      {/* Next Image will generate an optimized lazy loading image (based on browser and device) when request is made and cache that image to be used for requests from similar devices */}
+      {/* consider largest dimension the image will be displayed, by default next will scale down the dimensions for smaller viewports. when image looks blurry increase the dimensions. these dimensions only determine the image size REQUESTED. CSS applied to images still apply */}
+      <Image src={"/" + image} alt={title} width={250} height={160}/>
       <div className={classes.content}>
         <div className={classes.summary}>
           <h2>{title}</h2>
