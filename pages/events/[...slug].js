@@ -1,3 +1,5 @@
+import Head from "next/head";
+
 import { getFilteredEvents } from "../../utils/api-util";
 import EventList from "../../components/events/event-list";
 import ResultsTitle from "../../components/event-detail/results-title";
@@ -5,9 +7,22 @@ import Button from "../../components/ui/button";
 import ErrorAlert from "../../components/ui/error-alert";
 
 const FilteredEventsPage = ({ hasError, filteredEvents, numDate }) => {
+  const { numYear, numMonth } = numDate;
+
+  let pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`A list of filtered Events`}
+      />
+    </Head>
+  );
+
   if (hasError) {
     return (
       <>
+        { pageHeadData }
         <ErrorAlert>
           <p>Invalid filter. Please adjust your values</p>
         </ErrorAlert>
@@ -21,6 +36,7 @@ const FilteredEventsPage = ({ hasError, filteredEvents, numDate }) => {
   if (!filteredEvents || !filteredEvents.length) {
     return (
       <>
+        { pageHeadData }
         <ErrorAlert>
           <p>No events found for the chosen filter!</p>
         </ErrorAlert>
@@ -31,10 +47,20 @@ const FilteredEventsPage = ({ hasError, filteredEvents, numDate }) => {
     );
   }
 
-  const { numYear, numMonth } = numDate;
   const date = new Date(numYear, numMonth - 1); // date constructor expects month to start at 0
+  pageHeadData = (
+    <Head>
+      <title>Filtered Events</title>
+      <meta
+        name="description"
+        content={`All events for ${numMonth} / ${numYear}`}
+      />
+    </Head>
+  );
+  
   return (
     <>
+      { pageHeadData }
       <ResultsTitle date={date} />
       <EventList items={filteredEvents} />
     </>
@@ -64,11 +90,14 @@ export async function getServerSideProps(context) {
     };
   }
 
-  const filteredEvents = await getFilteredEvents({ numYear, numMonth });
+  const filteredEvents = await getFilteredEvents({
+    year: numYear,
+    month: numMonth,
+  });
   return {
     props: {
       filteredEvents,
-      numDate: { numYear, numMonth }
+      numDate: { numYear, numMonth },
     },
   };
 }

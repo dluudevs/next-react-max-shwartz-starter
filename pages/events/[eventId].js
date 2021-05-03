@@ -1,3 +1,5 @@
+import Head from "next/head";
+
 import { getFeaturedEvents, getEventById } from "../../utils/api-util";
 import EventSummary from "../../components/event-detail/event-summary";
 import EventLogistics from "../../components/event-detail/event-logistics";
@@ -14,6 +16,13 @@ const EventDetailPage = ({ event }) => {
 
   return (
     <>
+      <Head>
+        <title>{event.title}</title>
+        <meta
+          name="description"
+          content={event.description}
+        />
+      </Head>
       <EventSummary title={event.title} />
       <EventLogistics
         date={event.date}
@@ -35,7 +44,7 @@ export async function getStaticProps(context) {
   return {
     props: {
       event,
-      revalidate: 30 // rmb this simply re-renders the page (and fetches data again) if a new event page is created, this needs to be generated during build time. revalidate will NOT pick it up (static pages dont have to worry about this because only the data changes not the pages being generated)
+      revalidate: 30, // rmb this simply re-renders the page (and fetches data again) if a new event page is created, this needs to be generated during build time. revalidate will NOT pick it up (static pages dont have to worry about this because only the data changes not the pages being generated)
     },
   };
 }
@@ -45,13 +54,13 @@ export async function getStaticPaths() {
   const event = await getFeaturedEvents();
   const paths = event.map((e) => ({
     params: {
-      eventId: e.id
-    }
+      eventId: e.id,
+    },
   }));
 
   return {
     paths,
-    fallback: 'blocking', // cannot be false since only some pages are built, otherwise pages not returned by getStaticPaths will result in a 404 
+    fallback: "blocking", // cannot be false since only some pages are built, otherwise pages not returned by getStaticPaths will result in a 404
     //true will dynamically generate a page that wasn't generated statically. Component renders first (and any loading state) and then the getStaticProps function
     //blocking the component does not render first, getStaticProps called before the component, wait for HTML to be generated (behaves similar to SSR without the ssr function)
   };
